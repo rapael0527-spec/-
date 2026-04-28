@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Loading UX Research Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f7fb; --panel:#ffffff; --ink:#111827; --muted:#667085; --soft:#98a2b3;
+  --line:#e4e7ec; --line2:#eef1f6; --blue:#4f9df7; --blue2:#1d4f91; --blue3:#eaf4ff;
+  --dark:#071022; --dark2:#0b1730; --green:#24b47e; --red:#f04438;
+  --shadow:0 18px 45px rgba(16,24,40,.10); --shadow2:0 10px 26px rgba(16,24,40,.08);
+  --font:'Noto Sans KR',sans-serif;
+}
+html,body{width:100%;height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);overflow:hidden}
+button,input,textarea{font-family:var(--font);-webkit-appearance:none}
+/* iOS 터치 최적화 */
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input,textarea{font-size:16px!important} /* iOS 자동 줌 방지 */
+.screen{display:none;width:100vw;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.screen.active{display:flex}
+.app-shell{width:100%;min-height:100%;display:flex;justify-content:center}
+.container{width:100%;max-width:560px;padding:26px 20px calc(34px + env(safe-area-inset-bottom))}
+.glass{
+  background:rgba(255,255,255,.88); border:1px solid rgba(228,231,236,.88);
+  box-shadow:var(--shadow); border-radius:28px; backdrop-filter:blur(18px);
+}
+.top-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:var(--blue3);border:1px solid #d5eaff;color:var(--blue2);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.dot-mini{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.hero{padding:26px 22px 22px;margin-top:18px}
+.hero h1{font-size:27px;line-height:1.34;letter-spacing:-.035em;margin-top:18px}
+.hero p{font-size:14px;line-height:1.78;color:var(--muted);margin-top:12px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.meta-card{border:1px solid var(--line2);background:#fbfcff;border-radius:18px;padding:14px}
+.meta-label{font-size:11px;font-weight:800;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
+.meta-value{font-size:14px;font-weight:700;color:#243044;margin-top:5px;line-height:1.4}
+.notice{margin-top:22px;border-radius:18px;padding:15px 16px;background:#f8fbff;border:1px solid #e3efff}
+.notice p{font-size:12px;line-height:1.68;color:#4a5a72;margin:0}
+.input-area{margin-top:18px}
+.input-area label{display:block;font-size:13px;font-weight:800;color:#344054;margin-bottom:8px}
+.input-area input,.number-input{
+  width:100%;height:50px;padding:0 15px;border:1.5px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);
+  font-size:16px;outline:none;transition:.18s;
+}
+.input-area input:focus,.number-input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(79,157,247,.13)}
+.btn{
+  width:100%;min-height:56px;border:0;border-radius:17px;font-size:16px;font-weight:800;cursor:pointer;transition:.16s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn.primary{background:linear-gradient(135deg,#5aa8ff,#3d8ff0);color:#fff;box-shadow:0 12px 22px rgba(79,157,247,.27)}
+.btn.secondary{background:#fff;color:#243044;border:1.5px solid var(--line)}
+.btn.dark{background:rgba(255,255,255,.09);color:#fff;border:1.5px solid rgba(255,255,255,.18)}
+.btn:active{transform:translateY(1px);opacity:.9}
+.actions{margin-top:22px}
+.footer-note{font-size:11.5px;line-height:1.62;color:var(--soft);text-align:center;margin-top:12px}
+
+/* dark screens */
+.dark-screen{
+  background:
+    radial-gradient(circle at 50% 35%, rgba(79,157,247,.18), transparent 34%),
+    linear-gradient(180deg,var(--dark2),var(--dark));
+  align-items:center;justify-content:center;text-align:center;color:#fff;padding:28px;
+}
+.dark-box{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.dark-kicker{font-size:12px;font-weight:900;letter-spacing:.16em;color:rgba(143,194,255,.8);text-transform:uppercase}
+.dark-title{font-size:24px;font-weight:800;line-height:1.4;letter-spacing:-.025em}
+.dark-sub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.72}
+.pulse-wrap{margin-top:2px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(79,157,247,.08);border:1px solid rgba(79,157,247,.18)}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--blue);animation:pulse 1.15s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.34;transform:scale(.7)}}
+canvas{display:block}
+
+/* survey */
+#s-practice-survey,#s-survey,#s-final{background:var(--bg)}
+.sticky-top{
+  position:sticky;top:0;background:rgba(244,247,251,.88);backdrop-filter:blur(18px);z-index:10;
+  border-bottom:1px solid rgba(228,231,236,.75);padding:12px 18px 11px;
+}
+.progress-track{height:7px;background:#e7edf6;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#5aa8ff,#3d8ff0);border-radius:999px;transition:width .35s}
+.progress-text{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:7px}
+.survey-container{width:100%;max-width:620px;margin:0 auto;padding:18px 18px 32px}
+.survey-head{padding:20px 18px;margin-bottom:14px}
+.survey-kicker{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--blue2);text-transform:uppercase}
+.survey-title{font-size:20px;font-weight:900;margin-top:8px;letter-spacing:-.025em}
+.survey-sub{font-size:12px;line-height:1.65;color:var(--muted);margin-top:6px}
+.scale-guide{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.guide-item{background:#f8fbff;border:1px solid #e5effc;border-radius:14px;padding:10px;font-size:11px;color:#506079;line-height:1.5}
+.section-label{
+  display:flex;align-items:center;gap:8px;margin:20px 2px 5px;font-size:12px;font-weight:900;color:#475467;letter-spacing:.08em;text-transform:uppercase
+}
+.section-label:before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.section-desc{font-size:11.5px;color:#667085;margin:0 2px 9px;line-height:1.55}
+.q-card{padding:16px 16px 15px;margin-bottom:10px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow2)}
+.q-text{font-size:14px;font-weight:700;line-height:1.58;color:#1f2937;margin-bottom:13px}
+.likert-row{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.lbtn{aspect-ratio:1;min-height:44px;border:1.5px solid var(--line);border-radius:13px;background:#fff;color:#6b7280;font-weight:800;font-size:15px;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.lbtn.sel{background:linear-gradient(135deg,#5aa8ff,#3d8ff0);border-color:#4f9df7;color:#fff;box-shadow:0 9px 16px rgba(79,157,247,.24)}
+.likert-ends{display:flex;justify-content:space-between;font-size:11px;color:#98a2b3;margin-top:8px}
+.number-help{font-size:11px;color:#98a2b3;margin-top:7px;line-height:1.5}
+.survey-actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(244,247,251,0),var(--bg) 30%);padding:22px 0 calc(16px + env(safe-area-inset-bottom))}
+
+/* final */
+.final-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+.cond-btn{padding:15px 12px;border:1.7px solid var(--line);border-radius:18px;background:#fff;text-align:left;cursor:pointer;min-height:86px;transition:.15s}
+.cond-btn strong{display:block;font-size:14px;color:#1f2937}
+.cond-btn span{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:5px}
+.cond-btn.sel{border-color:var(--blue);background:var(--blue3);box-shadow:0 8px 18px rgba(79,157,247,.12)}
+textarea{width:100%;min-height:102px;padding:14px;border:1.5px solid var(--line);border-radius:18px;font-size:14px;line-height:1.65;resize:vertical;outline:none;background:#fff}
+
+/* done */
+.done-panel{width:100%;max-width:460px;padding:26px 22px;text-align:center}
+.done-icon{width:82px;height:82px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(79,157,247,.14);border:2px solid rgba(79,157,247,.36);font-size:38px}
+.done-title{font-size:25px;font-weight:900;color:#fff;margin-top:12px}
+.done-sub{font-size:14px;line-height:1.75;color:rgba(255,255,255,.60);margin-top:8px}
+.done-pid{font-size:12px;color:rgba(255,255,255,.38);font-family:monospace;margin-top:6px}
+.data-note{margin-top:14px;padding:12px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px;color:rgba(255,255,255,.58);line-height:1.6}
+
+/* replay modal */
+#replay-modal{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:radial-gradient(circle at 50% 35%, rgba(79,157,247,.18), transparent 34%),
+             linear-gradient(180deg,var(--dark2),var(--dark));
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  color:#fff;text-align:center;padding:28px;
+}
+#replay-modal.open{display:flex}
+.replay-kicker{font-size:11px;font-weight:900;letter-spacing:.16em;color:rgba(143,194,255,.8);text-transform:uppercase}
+.replay-title{font-size:20px;font-weight:800;letter-spacing:-.025em}
+.replay-sub{font-size:13px;color:rgba(255,255,255,.45);margin-top:-4px}
+#replay-canvas-wrap{margin-top:4px}
+.replay-close-btn{
+  margin-top:6px;padding:13px 32px;border:1.5px solid rgba(255,255,255,.18);
+  border-radius:16px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);
+  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);
+  transition:.15s;
+}
+.replay-close-btn:active{opacity:.7}
+.replay-btn{
+  margin-top:8px;padding:9px 18px;border:1.5px solid rgba(79,157,247,.4);
+  border-radius:12px;background:rgba(79,157,247,.1);color:rgba(143,194,255,.9);
+  font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);
+  transition:.15s;display:inline-flex;align-items:center;gap:6px;
+}
+.replay-btn:active{opacity:.7}
+
+
+@media (min-width:700px){
+  body{background:linear-gradient(135deg,#eef5ff,#f7f8fb 46%,#eef4fb)}
+  .container{padding-top:40px}
+}
+
+.final-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:11px}
+.cond-btn{
+  padding:15px 12px;border:1.7px solid var(--line);border-radius:18px;background:#fff;text-align:left;
+  cursor:pointer;min-height:152px;transition:.15s;overflow:hidden;
+}
+.cond-btn strong{display:block;font-size:14px;color:#1f2937}
+.cond-btn span{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:5px}
+.cond-btn.sel{border-color:var(--blue);background:var(--blue3)}
+.preview-wrap{
+  margin-top:12px;
+  height:78px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f8fbff,#ffffff);
+  border:1px solid #e5effc;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.preview-wrap canvas{
+  width:72px;
+  height:72px;
+}
+.preview-label{
+  position:absolute;
+  left:10px;
+  bottom:8px;
+  font-size:10px;
+  color:#667085;
+  font-weight:700;
+}
+.preview-time{
+  position:absolute;
+  right:10px;
+  bottom:8px;
+  font-size:10px;
+  color:#98a2b3;
+  font-weight:700;
+}
+
+</style>
+</head>
+<body>
+
+<div id="s-start" class="screen active">
+  <div class="app-shell">
+    <main class="container">
+      <span class="top-pill"><span class="dot-mini"></span>Loading UX Study</span>
+      <section class="hero glass">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;">
+          <div>
+            <div style="font-size:12px;font-weight:800;color:#4f9df7;letter-spacing:.08em;text-transform:uppercase;">Interactive Prototype</div>
+            <h1 style="margin-top:10px;">모바일 앱 로딩 화면<br>사용자 경험 실험</h1>
+          </div>
+          <div style="width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,#eaf4ff,#ffffff);border:1px solid #dbeafe;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(79,157,247,.13);">
+            <div style="width:28px;height:28px;border:4px solid #d5eaff;border-top-color:#4f9df7;border-radius:50%;"></div>
+          </div>
+        </div>
+
+        <p>본 실험은 로딩 화면의 움직임 방식에 따라 사용자가 느끼는 대기시간, 감정 반응, 주의 집중, 전반적 만족도가 어떻게 달라지는지 확인하기 위한 연구용 프로토타입입니다.</p>
+
+        <div class="notice">
+          <p><b>진행 안내</b><br>화면에 제시되는 로딩 UI를 자연스럽게 관찰한 뒤, 이어지는 문항에 느낀 그대로 응답해주세요. 정답은 없으며, 모든 응답은 익명으로 처리됩니다.</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+          <div style="background:#fbfcff;border:1px solid #eef1f6;border-radius:16px;padding:13px;">
+            <div style="font-size:11px;font-weight:900;color:#98a2b3;letter-spacing:.06em;text-transform:uppercase;">Step 01</div>
+            <div style="font-size:13px;font-weight:800;color:#243044;margin-top:5px;">로딩 화면 관찰</div>
+          </div>
+          <div style="background:#fbfcff;border:1px solid #eef1f6;border-radius:16px;padding:13px;">
+            <div style="font-size:11px;font-weight:900;color:#98a2b3;letter-spacing:.06em;text-transform:uppercase;">Step 02</div>
+            <div style="font-size:13px;font-weight:800;color:#243044;margin-top:5px;">즉시 설문 응답</div>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <label for="pid-input">참가자 번호</label>
+          <input type="number" id="pid-input" placeholder="실험자에게 안내받은 번호를 입력해주세요" min="1" inputmode="numeric">
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="startExp()">실험 시작하기 →</button>
+          <div class="footer-note">실험 중에는 브라우저 뒤로가기나 새로고침을 누르지 말고 순서대로 진행해주세요.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="s-practice-attention" class="screen dark-screen">
+  <div class="dark-box">
+    <div class="dark-kicker">Practice Trial</div>
+    <div class="dark-title">연습 시행을 시작합니다</div>
+    <div class="dark-sub">실제 실험과 동일한 길이로 로딩 화면이 제시됩니다.</div>
+    <div class="pulse-wrap"><div class="pulse"></div></div>
+  </div>
+</div>
+
+<div id="s-practice-loading" class="screen dark-screen">
+  <canvas id="cv-practice"></canvas>
+</div>
+
+<div id="s-practice-survey" class="screen"></div>
+
+<div id="s-attention" class="screen dark-screen">
+  <div class="dark-box">
+    <div class="dark-kicker" id="attn-badge">조건 1 / 8</div>
+    <div class="dark-title">다음 로딩 화면을 관찰해주세요</div>
+    <div class="dark-sub">로딩이 완료되면 평가 문항으로 자동 이동합니다.</div>
+    <div class="pulse-wrap"><div class="pulse"></div></div>
+  </div>
+</div>
+
+<div id="s-loading" class="screen dark-screen">
+  <canvas id="cv-main"></canvas>
+</div>
+
+<div id="s-survey" class="screen"></div>
+
+<div id="s-final" class="screen">
+  <div class="survey-container">
+    <div class="survey-head glass">
+      <div class="survey-kicker">최종 비교 평가</div>
+      <div class="survey-title">전체 로딩 화면 비교 평가</div>
+      <div class="survey-sub">지금까지 본 8개의 로딩 화면을 기준으로 아래 항목에 응답해주세요.</div>
+    </div>
+
+    <div class="section-label">지각된 대기 시간</div>
+    <div class="q-card">
+      <div class="q-text">전체 조건 중 가장 짧게 느껴진 로딩 화면은 무엇이었습니까?</div>
+      <div class="final-grid" id="grid-shortest"></div>
+    </div>
+
+    <div class="section-label">선호도</div>
+    <div class="q-card">
+      <div class="q-text">전체 조건 중 전반적으로 가장 선호하는 로딩 화면은 무엇이었습니까?</div>
+      <div class="final-grid" id="grid-preferred"></div>
+    </div>
+
+    <div class="section-label">선택 이유</div>
+    <div class="q-card">
+      <div class="q-text">선택한 이유를 간단히 적어주세요. <span style="color:#667085;font-size:12px">(선택 사항)</span></div>
+      <textarea id="reason-txt" placeholder="예: 진행 상황이 명확하게 보여서 기다리는 시간이 덜 길게 느껴졌습니다."></textarea>
+    </div>
+
+    <div class="survey-actions">
+      <button class="btn primary" onclick="submitFinal()">응답 제출하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-done" class="screen dark-screen">
+  <div class="done-panel glass">
+    <div style="display:flex;justify-content:center"><div class="done-icon">✓</div></div>
+    <div class="done-title">실험이 완료되었습니다</div>
+    <p class="done-sub">참여해 주셔서 감사합니다.<br>아래 버튼을 눌러 응답을 제출해주세요.</p>
+    <div class="done-pid" id="done-pid"></div>
+    <div class="actions">
+      <button class="btn dark" id="submit-btn" onclick="submitToSheet()">응답 데이터 제출</button>
+    </div>
+    <div id="submit-status" style="margin-top:12px;font-size:13px;line-height:1.6;min-height:20px"></div>
+    <div class="data-note" style="margin-top:16px">
+      전송이 실패하는 경우 아래 버튼으로 CSV를 저장한 뒤 실험자에게 전달해주세요.
+    </div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn dark" onclick="downloadCSV()" style="opacity:.6;font-size:13px;min-height:42px">CSV로 저장 (백업)</button>
+    </div>
+  </div>
+</div>
+
+<!-- 재생 모달 -->
+<div id="replay-modal">
+  <div class="replay-kicker" id="replay-kicker">조건 1</div>
+  <div class="replay-title" id="replay-title">로딩 재생 중</div>
+  <div class="replay-sub" id="replay-sub"></div>
+  <div id="replay-canvas-wrap">
+    <canvas id="replay-canvas"></canvas>
+  </div>
+  <button class="replay-close-btn" id="replay-close-btn" onclick="closeReplay()" style="display:none">닫기</button>
+</div>
+
+<script>
+
+
+
+
+
+
+
+// ─────────────────────────────────────
+// 단계식 위치 시간표
+// 구불/선은 동일한 시간표를 사용하고, 차이는 wavy:true/false뿐입니다.
+// 이동은 순간이동이 아니라 짧게 움직인 뒤 멈추는 방식입니다.
+// 회전 스피너는 10~15초 동안 부드럽게 회전합니다.
+// ─────────────────────────────────────
+
+// 15초 초반 급발진(구불/선)
+const S_A15=[
+  {t:0,pct:0},
+  {t:500,pct:15},    // 0.5초: 15%
+  {t:1000,pct:35},   // 1초: 35%
+  {t:2000,pct:70},   // 2초: 70%
+  {t:3000,pct:82},   // 3초: 82%
+  {t:5000,pct:88},   // 5초: 88%
+  {t:8000,pct:93},   // 8초: 93%
+  {t:12000,pct:97},  // 12초: 97%
+  {t:15000,pct:100}  // 15초: 100%
+];
+
+// 15초 후반 급발진(구불/선)
+const S_D15=[
+  {t:0,pct:0},
+  {t:1000,pct:5},    // 1~3초: 5%
+  {t:3000,pct:10},   // 3~8초: 10%
+  {t:8000,pct:13},   // 8~11초: 13%
+  {t:11000,pct:18},  // 11~13초: 18%
+  {t:13000,pct:70},  // 13~14초: 70%
+  {t:14500,pct:85},  // 14.5초: 85%
+  {t:15000,pct:100}  // 15초: 100%
+];
+
+// 10초 초반 급발진(구불/선) + 5초 회전
+const S_A10=[
+  {t:0,pct:0},
+  {t:300,pct:15},    // 0.3초: 15%
+  {t:700,pct:35},    // 0.7초: 35%
+  {t:1300,pct:70},   // 1.3초: 70%
+  {t:2000,pct:82},   // 2초: 82%
+  {t:3300,pct:88},   // 3.3초: 88%
+  {t:5300,pct:93},   // 5.3초: 93%
+  {t:8000,pct:97},   // 8초: 97%
+  {t:10000,pct:100}  // 10초: 100%
+];
+
+// 10초 후반 급발진(구불/선) + 5초 회전
+const S_D10=[
+  {t:0,pct:0},
+  {t:700,pct:5},     // 0.7~2초: 5%
+  {t:2000,pct:10},   // 2~5.3초: 10%
+  {t:5300,pct:13},   // 5.3~7.3초: 13%
+  {t:7300,pct:18},   // 7.3~8.7초: 18%
+  {t:8700,pct:70},   // 8.7~9.3초: 70%
+  {t:9700,pct:85},   // 9.7초: 85%
+  {t:10000,pct:100}  // 10초: 100%
+];
+
+const CONDITIONS=[
+{id:1,label:'조건 1',desc:'단순 · 가속 · 진행형',wavy:false,steps:S_A15,spin:false},
+{id:2,label:'조건 2',desc:'단순 · 감속 · 진행형',wavy:false,steps:S_D15,spin:false},
+{id:3,label:'조건 3',desc:'구불 · 가속 · 진행형',wavy:true,steps:S_A15,spin:false},
+{id:4,label:'조건 4',desc:'구불 · 감속 · 진행형',wavy:true,steps:S_D15,spin:false},
+{id:5,label:'조건 5',desc:'단순 · 가속 · 진행+스피너',wavy:false,steps:S_A10,spin:true},
+{id:6,label:'조건 6',desc:'단순 · 감속 · 진행+스피너',wavy:false,steps:S_D10,spin:true},
+{id:7,label:'조건 7',desc:'구불 · 가속 · 진행+스피너',wavy:true,steps:S_A10,spin:true},
+{id:8,label:'조건 8',desc:'구불 · 감속 · 진행+스피너',wavy:true,steps:S_D10,spin:true}
+];
+
+const TOTAL=15000,SPIN_START=10000,SW=8,AMP=7,FREQ=16,FLOW=7;
+let PID='',ORDER=[0,1,2,3,4,5,6,7],trialIdx=0,responses=[],practiceAns={},curAns={},finalShortest=null,finalPreferred=null,activeLoader=null;
+
+function eio(t){return t<.5?2*t*t:-1+(4-2*t)*t}
+function show(id){
+  if(id!=='s-final' && typeof stopMiniPreviews==='function') stopMiniPreviews();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const target=document.getElementById(id);
+  target.classList.add('active');
+  target.scrollTop=0;
+  setTimeout(()=>{target.scrollTop=0; window.scrollTo(0,0);},0);
+}
+function makeCanvas(id){const cv=document.getElementById(id),dpr=window.devicePixelRatio||1,cs=Math.min(window.innerWidth,window.innerHeight)*.56;cv.style.width=cs+'px';cv.style.height=cs+'px';cv.width=Math.round(cs*dpr);cv.height=Math.round(cs*dpr);return cv}
+function ansObj(){return{q1:null,q2:null,q3:null,q4:null,q5:null,q6:null,q7:null,q8:null,q9:null,time:null}}
+function conditionMeta(idx){
+  const c=CONDITIONS[idx];
+  return {
+    idx,
+    speed: c.desc.includes('가속') ? 'A' : 'D',
+    shape: c.desc.includes('구불') ? 'W' : 'S',
+    spin: c.spin ? 'P' : 'N'
+  };
+}
+
+// ── 8×8 Balanced Latin Square (Williams Design) ─────────────
+// 각 조건이 각 순서 위치에 정확히 1번씩 등장하고,
+// 모든 조건 쌍이 인접하는 횟수도 균등하게 분산됨
+// PID 1~8 → 각각 다른 행, PID 9부터 순환
+const LATIN_SQUARE=[
+  [0,1,7,2,6,3,5,4], // PID 1
+  [1,2,0,3,7,4,6,5], // PID 2
+  [2,3,1,4,0,5,7,6], // PID 3
+  [3,4,2,5,1,6,0,7], // PID 4
+  [4,5,3,6,2,7,1,0], // PID 5
+  [5,6,4,7,3,0,2,1], // PID 6
+  [6,7,5,0,4,1,3,2], // PID 7
+  [7,0,6,1,5,2,4,3], // PID 8
+];
+
+function getOrder(){
+  // URL ?order=12345678 로 수동 지정 가능 (디버그용)
+  const p=new URLSearchParams(window.location.search).get('order');
+  if(p&&p.length===8){
+    const a=p.split('').map(c=>parseInt(c)-1);
+    if([...a].sort().join('')==='01234567')return a;
+  }
+  // PID 기반 라틴스퀘어 행 선택 (1-indexed → 0-indexed row)
+  const pid=parseInt(PID)||1;
+  return LATIN_SQUARE[(pid-1)%8];
+}
+
+class PLoader{
+constructor(cv,wavy,steps,hasSpin){this.cv=cv;this.ctx=cv.getContext('2d');this.wavy=wavy;this.steps=steps;this.hasSpin=hasSpin;const cs=parseInt(cv.style.width);this.R=cs*.34;this.CX=cs/2;this.CY=cs/2;this.CAP=SW/2/this.R;this.p1End=hasSpin?SPIN_START:TOTAL;this.angle=-Math.PI/2;this.done=false;this.doneAt=null;this.raf=null;this.t0=null;this.cb=null}
+start(cb){this.cb=cb;this.t0=performance.now();this.raf=requestAnimationFrame(t=>this.loop(t))}
+stop(){if(this.raf)cancelAnimationFrame(this.raf)}
+loop(now){const el=now-this.t0;this.update(el);this.draw(el);if(el>=TOTAL+500){if(this.cb)this.cb();return}this.raf=requestAnimationFrame(t=>this.loop(t))}
+update(el){
+  if(el>=TOTAL){
+    if(!this.done)this.doneAt=el;
+    this.done=true;
+    this.angle=-Math.PI/2+Math.PI*2;
+    return;
+  }
+
+  this.done=false;
+
+  // 단계식 위치 시간표 모드
+  // 지정된 시점마다 짧게 이동하고, 다음 시점까지 멈춰 있습니다.
+  if(this.steps && this.steps.length && this.steps[0].pct!==undefined){
+    const MOVE_MS=420;
+    const clamped=Math.min(el,this.p1End);
+
+    let pct=this.steps[0].pct;
+
+    for(let i=1;i<this.steps.length;i++){
+      const prev=this.steps[i-1];
+      const cur=this.steps[i];
+
+      if(clamped < cur.t){
+        pct=prev.pct;
+        break;
+      }
+
+      if(clamped >= cur.t && clamped < cur.t + MOVE_MS){
+        const r=(clamped-cur.t)/MOVE_MS;
+        const eased=eio(Math.max(0,Math.min(1,r)));
+        pct=prev.pct+(cur.pct-prev.pct)*eased;
+        break;
+      }
+
+      pct=cur.pct;
+    }
+
+    this.angle=-Math.PI/2+(pct/100)*Math.PI*2;
+    return;
+  }
+
+  if(el<=this.p1End){
+    let rem=el,cum=0;
+    for(let i=0;i<this.steps.length;i++){
+      const s=this.steps[i],tot=s.dur+s.pause;
+      if(rem<=tot){
+        const d=rem<=s.dur?eio(rem/s.dur)*s.deg:s.deg;
+        this.angle=-Math.PI/2+((cum+d)/360)*Math.PI*2;
+        return;
+      }
+      cum+=s.deg;rem-=tot;
+    }
+    this.angle=-Math.PI/2+Math.PI*2;
+  }
+}
+draw(el){const{ctx,CX,CY,R,CAP}=this,dpr=window.devicePixelRatio||1,wt=el/1000;ctx.clearRect(0,0,this.cv.width,this.cv.height);ctx.save();ctx.scale(dpr,dpr);const sA=-Math.PI/2,fA=sA+Math.PI*2;if(this.done){ctx.beginPath();ctx.arc(CX,CY,R,sA,fA);ctx.strokeStyle='#4f9df7';ctx.lineWidth=SW;ctx.lineCap='butt';ctx.stroke();const p=this.doneAt!=null?Math.min((el-this.doneAt)/400,1):1,ep=eio(p);ctx.save();ctx.globalAlpha=ep;ctx.translate(CX,CY);ctx.scale(ep,ep);ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fillStyle='#4f9df7';ctx.fill();ctx.beginPath();ctx.moveTo(-10,1);ctx.lineTo(-3,10);ctx.lineTo(13,-10);ctx.strokeStyle='#fff';ctx.lineWidth=3.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}else if(this.hasSpin&&el>this.p1End){ctx.beginPath();ctx.arc(CX,CY,R,sA,fA);ctx.strokeStyle='#1d4f91';ctx.lineWidth=SW;ctx.lineCap='butt';ctx.stroke();const rot=(el-this.p1End)/1000*Math.PI*2*1.8-Math.PI/2;ctx.beginPath();ctx.arc(CX,CY,R,rot,rot+Math.PI*1.5);ctx.strokeStyle='#4f9df7';ctx.lineWidth=SW;ctx.lineCap='round';ctx.stroke()}else{const eA=this.angle,span=eA-sA,gs=eA+CAP,ge=fA-CAP;if(span>.05&&gs<ge){ctx.beginPath();ctx.arc(CX,CY,R,gs,ge);ctx.strokeStyle='#1d4f91';ctx.lineWidth=SW;ctx.lineCap='round';ctx.stroke()}if(span>.01){if(!this.wavy){ctx.beginPath();ctx.arc(CX,CY,R,sA,eA);ctx.strokeStyle='#4f9df7';ctx.lineWidth=SW;ctx.lineCap='round';ctx.stroke()}else this.wavyDraw(ctx,sA,eA,wt)}}ctx.restore()}
+wavyDraw(ctx,sA,eA,wt){const{CX,CY,R}=this,segs=280,span=eA-sA,pts=[];if(span<=.01)return;for(let i=0;i<=segs;i++){const t=i/segs,a=sA+t*span,ph=(a/(Math.PI*2))*Math.PI*2*FREQ-wt*FLOW;pts.push([CX+(R+AMP*Math.sin(ph))*Math.cos(a),CY+(R+AMP*Math.sin(ph))*Math.sin(a)])}ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<segs;i++){const mx=(pts[i-1][0]+pts[i][0])/2,my=(pts[i-1][1]+pts[i][1])/2;ctx.quadraticCurveTo(pts[i-1][0],pts[i-1][1],mx,my)}ctx.lineTo(pts[segs][0],pts[segs][1]);ctx.strokeStyle='#4f9df7';ctx.lineWidth=SW;ctx.lineCap='round';ctx.stroke()}
+}
+class PracticeLoader{
+constructor(cv){this.cv=cv;this.ctx=cv.getContext('2d');const cs=parseInt(cv.style.width);this.R=cs*.34;this.CX=cs/2;this.CY=cs/2;this.dur=15000;this.t0=null;this.raf=null;this.cb=null}
+start(cb){this.cb=cb;this.t0=performance.now();this.raf=requestAnimationFrame(t=>this.loop(t))}
+stop(){if(this.raf)cancelAnimationFrame(this.raf)}
+loop(now){const el=now-this.t0;this.draw(el);if(el>=this.dur+500){if(this.cb)this.cb();return}this.raf=requestAnimationFrame(t=>this.loop(t))}
+draw(el){const{ctx,CX,CY,R}=this,dpr=window.devicePixelRatio||1,p=Math.min(el/this.dur,1),sA=-Math.PI/2;ctx.clearRect(0,0,this.cv.width,this.cv.height);ctx.save();ctx.scale(dpr,dpr);ctx.beginPath();ctx.arc(CX,CY,R,sA,sA+Math.PI*2);ctx.strokeStyle='#1d4f91';ctx.lineWidth=SW;ctx.lineCap='butt';ctx.stroke();if(p>.01){ctx.beginPath();ctx.arc(CX,CY,R,sA,sA+Math.PI*2*p);ctx.strokeStyle='#4f9df7';ctx.lineWidth=SW;ctx.lineCap='round';ctx.stroke()}if(p>=1){const ep=eio(Math.min((el-this.dur)/400,1));ctx.save();ctx.globalAlpha=ep;ctx.translate(CX,CY);ctx.scale(ep,ep);ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fillStyle='#4f9df7';ctx.fill();ctx.beginPath();ctx.moveTo(-10,1);ctx.lineTo(-3,10);ctx.lineTo(13,-10);ctx.strokeStyle='#fff';ctx.lineWidth=3.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}ctx.restore()}
+}
+
+function buildLikert(containerId,store,key){const c=document.getElementById(containerId);if(!c)return;c.innerHTML='';for(let i=1;i<=7;i++){const b=document.createElement('button');b.type='button';b.className='lbtn';b.textContent=i;b.onclick=()=>{c.querySelectorAll('.lbtn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');store[key]=i};c.appendChild(b)}}
+function surveyHTML(prefix,isMain){
+const inputId=isMain?'time-input':'ptime-input',action=isMain?'submitSurvey()':'endPractice()',btn=isMain?'다음 조건으로 이동':'연습 완료 — 본 실험 시작';
+const top=isMain?'<div class="sticky-top"><div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div><div class="progress-text"><span id="prog-label">0 / 8 완료</span></div></div>':'';
+const tag=isMain?'<span id="s-tag">조건 1</span>':'Practice Trial';
+
+const SECTION_DESCS={
+  '시간 지각':'이 로딩을 기다리는 시간을 주관적으로 어떻게 인식했는지 평가해주세요.',
+  '지각된 속도 패턴':'로딩 진행 속도의 변화 패턴을 어떻게 체감했는지 평가해주세요.',
+  '진행 투명성':'로딩 상태가 얼마나 명확하게 전달되었는지 평가해주세요.',
+  '감정 반응':'기다리는 동안 느낀 감정을 평가해주세요.',
+  '주의 집중':'기다리는 동안 주의 상태를 평가해주세요.',
+  '전반적 평가':'이 로딩 방식에 대한 전반적인 평가를 해주세요.',
+  '행동 의도':'로딩을 보면서 든 행동 충동을 평가해주세요.'
+};
+
+// [섹션, 문항 텍스트, key, 왼쪽 레이블, 오른쪽 레이블]
+const qs=[
+  ['시간 지각',        '1. 이 로딩 화면은 전체적으로 오래 기다린 것처럼 느껴졌습니다',  'q1', '전혀 아니다',           '매우 그렇다'],
+  ['',                 '2. 실제로 몇 초 정도로 느껴졌는지 적어주세요',                  'time','',                     ''],
+  ['',                 '3. 기다리는 동안 시간이 얼마나 빠르게 흘렀습니까?',             'q2', '매우 느리게',           '매우 빠르게'],
+  ['지각된 속도 패턴', '4. 로딩 진행 속도의 변화는 어떻게 느껴졌습니까?',              'q3', '초반 빠름 → 후반 느림', '초반 느림 → 후반 빠름'],
+  ['진행 투명성',      '5. 로딩이 언제 끝날지 예측할 수 있었습니다',                    'q4', '전혀 아니다',           '매우 그렇다'],
+  ['',                 '6. 로딩 진행 상황이 명확하게 전달되었습니다',                   'q5', '전혀 아니다',           '매우 그렇다'],
+  ['감정 반응',        '7. 기다리는 동안 답답함을 느꼈습니다',                          'q6', '전혀 아니다',           '매우 그렇다'],
+  ['주의 집중',        '8. 기다리는 동안 화면에 집중하게 되었습니다',                   'q7', '전혀 아니다',           '매우 그렇다'],
+  ['전반적 평가',      '9. 전반적으로 이 로딩 방식은 만족스럽다고 느껴졌습니다',         'q8', '전혀 아니다',           '매우 그렇다'],
+  ['행동 의도',        '10. 이 상황에서 앱을 종료하고 싶다는 생각이 들었습니다',          'q9', '전혀 아니다',           '매우 그렇다'],
+];
+
+let body='',idx=1;
+qs.forEach(([sec,text,key,leftLabel,rightLabel])=>{
+  if(sec){
+    body+=`<div class="section-label">${sec}</div>`;
+    const desc=SECTION_DESCS[sec];
+    if(desc) body+=`<div class="section-desc">${desc}</div>`;
+  }
+  if(key==='time'){
+    body+=`<div class="q-card"><div class="q-text">${text}</div><input class="number-input" type="number" id="${inputId}" placeholder="예: 12" inputmode="numeric"><div class="number-help">정확하지 않아도 괜찮습니다. 체감상 느껴진 시간을 숫자로 입력해주세요.</div></div>`;
+  } else {
+    const id=`${prefix}-${idx++}`;
+    body+=`<div class="q-card"><div class="q-text">${text}</div><div class="likert-row" id="${id}"></div><div class="likert-ends"><span>${leftLabel}</span><span>${rightLabel}</span></div></div>`;
+  }
+});
+
+return `${top}<div class="survey-container"><div class="survey-head glass"><div class="survey-kicker">${tag}</div><div class="survey-title">방금 본 로딩 화면을 평가해주세요</div><div class="survey-sub">모든 문항은 7점 척도로 응답합니다. 문항에 따라 양 끝의 의미가 다르므로 각 레이블을 확인해주세요.</div><div class="scale-guide"><div class="guide-item"><b>1점</b><br>왼쪽 끝에 가까움</div><div class="guide-item"><b>7점</b><br>오른쪽 끝에 가까움</div></div></div>${body}<div class="survey-actions"><button class="btn primary" onclick="${action}">${btn}</button></div></div>`;
+}
+function buildSurveyContainers(){document.getElementById('s-practice-survey').innerHTML=surveyHTML('pl',false);document.getElementById('s-survey').innerHTML=surveyHTML('ml',true)}
+function buildAllLikerts(){
+  const keys=['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+  keys.forEach((key,i)=>{
+    buildLikert(`pl-${i+1}`,practiceAns,key);
+    buildLikert(`ml-${i+1}`,curAns,key);
+  });
+}
+
+function startExp(){
+  PID=document.getElementById('pid-input').value.trim();
+  if(!PID){alert('참가자 번호를 입력해주세요.');return}
+  ORDER=getOrder();
+  responses=[];
+  trialIdx=0;
+  practiceAns=ansObj();
+  curAns=ansObj();
+  buildSurveyContainers();
+  buildAllLikerts();
+  buildFinalGrids();
+  show('s-practice-attention');
+  setTimeout(runPracticeLoading,2500);
+}
+
+function runPracticeLoading(){show('s-practice-loading');if(activeLoader){activeLoader.stop();activeLoader=null}const cv=makeCanvas('cv-practice');activeLoader=new PracticeLoader(cv);activeLoader.start(()=>show('s-practice-survey'))}
+function valid(store,timeId){store.time=(document.getElementById(timeId)?.value||'').trim();const keys=['q1','q2','q3','q4','q5','q6','q7','q8','q9'];return !keys.some(k=>store[k]===null||store[k]===undefined||store[k]==='')&&store.time!==''}
+function endPractice(){if(!valid(practiceAns,'ptime-input')){alert('모든 문항에 응답해주세요.');return}trialIdx=0;runAttention()}
+function runAttention(){if(activeLoader){activeLoader.stop();activeLoader=null}document.getElementById('attn-badge').textContent=`조건 ${trialIdx+1} / 8`;show('s-attention');setTimeout(runLoading,2500)}
+function runLoading(){
+  show('s-loading');
+  const cond=CONDITIONS[ORDER[trialIdx]];
+
+  if(activeLoader){
+    activeLoader.stop();
+    activeLoader=null;
+  }
+
+  const cv=makeCanvas('cv-main');
+  activeLoader=new PLoader(cv,cond.wavy,cond.steps,cond.spin);
+
+  activeLoader.start(()=>{
+    curAns=ansObj();
+
+    // 현재 조건 설문만 새로 생성
+    const survey=document.getElementById('s-survey');
+    survey.innerHTML=surveyHTML('ml',true);
+
+    const keys=['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+    keys.forEach((key,i)=>buildLikert(`ml-${i+1}`,curAns,key));
+
+    const fill=document.getElementById('prog-fill');
+    const label=document.getElementById('prog-label');
+    const tag=document.getElementById('s-tag');
+
+    if(fill) fill.style.width=((trialIdx+1)/8*100)+'%';
+    if(label) label.textContent=`${trialIdx+1} / 8 완료`;
+    if(tag) tag.textContent=`조건 ${trialIdx+1}`;
+
+    show('s-survey');
+  });
+}
+
+function submitSurvey(){
+  const timeEl=document.getElementById('time-input');
+  curAns.time=timeEl ? timeEl.value.trim() : '';
+
+  const keys=['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+  const missing=keys.some(k=>curAns[k]===null || curAns[k]===undefined || curAns[k]==='') || curAns.time==='';
+
+  if(missing){
+    alert('모든 문항에 응답해주세요.');
+    return;
+  }
+
+  const cond=CONDITIONS[ORDER[trialIdx]];
+
+  responses.push({
+    trialOrder:trialIdx+1,
+    conditionId:cond.id,
+    conditionDesc:cond.desc,
+    perceivedDuration:curAns.q1,       // 오래 기다린 느낌 (단극)
+    timeEstimate:curAns.time,           // 시간 추정 (초)
+    speedPerception:curAns.q2,          // 느리게↔빠르게 (양극)
+    speedPattern:curAns.q3,             // 초반빠름↔후반빠름 (양극, IV2 MC)
+    progressPredictability:curAns.q4,   // 언제 끝날지 예측
+    progressClarity:curAns.q5,          // 진행 상황 명확
+    frustration:curAns.q6,              // 답답함 (단극)
+    attention:curAns.q7,                // 화면 집중 (단극)
+    satisfaction:curAns.q8,             // 전반적 만족도
+    exitIntent:curAns.q9                // 앱 종료 의향
+  });
+
+  trialIdx++;
+
+  if(trialIdx>=8){
+    alert('실험이 완료되었습니다.');;
+  }else{
+    runAttention();
+  }
+}
+
+
+
+let miniPreviewLoaders=[];
+
+function stopMiniPreviews(){
+  miniPreviewLoaders.forEach(item=>{
+    if(item.loader) item.loader.stop();
+    if(item.timer) clearTimeout(item.timer);
+  });
+  miniPreviewLoaders=[];
+}
+
+function startMiniPreviews(){
+  stopMiniPreviews();
+
+  document.querySelectorAll('.mini-loader').forEach(cv=>{
+    const id=Number(cv.dataset.cond);
+    const cond=CONDITIONS.find(c=>c.id===id);
+    if(!cond) return;
+
+    // PLoader는 실제 실험 로딩을 그리는 클래스입니다.
+    // 여기서는 같은 PLoader를 작은 canvas에 그대로 적용합니다.
+    cv.style.width='72px';
+    cv.style.height='72px';
+    cv.width=144;
+    cv.height=144;
+
+    const run=()=>{
+      const loader=new PLoader(cv,cond.wavy,cond.steps,cond.spin);
+      miniPreviewLoaders.push({loader});
+      loader.start(()=>{
+        // 한 번 재생 후 잠깐 쉬고 반복
+        const timer=setTimeout(run,700);
+        miniPreviewLoaders.push({timer});
+      });
+    };
+
+    run();
+  });
+}
+
+function buildFinalGrids(){buildGrid('grid-shortest','shortest');buildGrid('grid-preferred','preferred')}
+function buildGrid(gridId,type){
+  const g=document.getElementById(gridId);
+  g.innerHTML='';
+  CONDITIONS.forEach(cond=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='cond-btn';
+    const shape=cond.wavy?'구불 선':'기본 선';
+    const speed=cond.desc.includes('가속')?'가속형 (초반 빠름)':'감속형 (후반 빠름)';
+    const stage=cond.spin?'2단계 (진행+스피너)':'1단계 (진행)';
+    b.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <strong>${cond.label}</strong>
+        <button type="button" class="replay-btn" onclick="event.stopPropagation();openReplay(${cond.id-1})">▶ 다시 보기</button>
+      </div>
+      <div class="preview-wrap">
+        <canvas class="mini-loader" width="144" height="144" data-cond="${cond.id}"></canvas>
+        <div class="preview-label">${shape} · ${speed}</div>
+        <div class="preview-time">${stage}</div>
+      </div>
+    `;
+    b.onclick=()=>{
+      g.querySelectorAll('.cond-btn').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      if(type==='shortest')finalShortest=cond.id;
+      else finalPreferred=cond.id;
+    };
+    g.appendChild(b);
+  });
+  setTimeout(startMiniPreviews,80);
+}
+
+let replayLoader=null;
+function openReplay(condIdx){
+  const cond=CONDITIONS[condIdx];
+  const modal=document.getElementById('replay-modal');
+  const closeBtn=document.getElementById('replay-close-btn');
+  document.getElementById('replay-kicker').textContent=cond.label;
+  document.getElementById('replay-title').textContent=cond.desc;
+  document.getElementById('replay-sub').textContent='실험에서 본 것과 동일한 로딩을 재생합니다';
+  closeBtn.style.display='none';
+
+  // 캔버스 초기화
+  const cv=document.getElementById('replay-canvas');
+  const dpr=window.devicePixelRatio||1;
+  const cs=Math.min(window.innerWidth,window.innerHeight)*.58;
+  cv.style.width=cs+'px';cv.style.height=cs+'px';
+  cv.width=Math.round(cs*dpr);cv.height=Math.round(cs*dpr);
+
+  if(replayLoader){replayLoader.stop();replayLoader=null;}
+  modal.classList.add('open');
+
+  replayLoader=new PLoader(cv,cond.wavy,cond.steps,cond.spin);
+  replayLoader.start(()=>{
+    closeBtn.style.display='block';
+  });
+}
+function closeReplay(){
+  if(replayLoader){replayLoader.stop();replayLoader=null;}
+  document.getElementById('replay-modal').classList.remove('open');
+}
+function submitFinal(){if(!finalShortest){alert('가장 짧게 느껴진 조건을 선택해주세요.');return}if(!finalPreferred){alert('가장 선호하는 조건을 선택해주세요.');return}document.getElementById('done-pid').textContent=`참가자 번호: ${PID}`;show('s-done')}
+
+
+
+
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxlsR53wYjNCAVQgPBPOXKJuQseMQ8QxjYkEty4nffv3ZuWVaeFwhPH9P5BV6FOwzqG7A/exec';
+
+async function submitToSheet(){
+  const btn=document.getElementById('submit-btn');
+  const status=document.getElementById('submit-status');
+  const reason=(document.getElementById('reason-txt')?.value||'').trim();
+
+  btn.disabled=true;btn.textContent='전송 중…';status.textContent='';
+
+  const payload={
+    participant_id:PID,
+    order_used:ORDER.map(i=>i+1).join(','),
+    submitted_at:new Date().toISOString(),
+    final_shortest:finalShortest,
+    final_preferred:finalPreferred,
+    reason,
+    trials:responses.map(r=>({
+      trial_order:r.trialOrder,
+      condition_id:r.conditionId,
+      condition_desc:r.conditionDesc,
+      perceived_duration:r.perceivedDuration,
+      time_estimate:r.timeEstimate,
+      speed_perception:r.speedPerception,
+      speed_pattern:r.speedPattern,
+      progress_predictability:r.progressPredictability,
+      progress_clarity:r.progressClarity,
+      frustration:r.frustration,
+      attention:r.attention,
+      satisfaction:r.satisfaction,
+      exit_intent:r.exitIntent
+    }))
+  };
+
+  try{
+    await fetch(GAS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(payload)
+    });
+    btn.textContent='✓ 제출 완료';
+    btn.style.background='rgba(36,180,126,.25)';
+    btn.style.borderColor='rgba(36,180,126,.4)';
+    status.textContent='응답이 연구자에게 전달되었습니다. 감사합니다!';
+    status.style.color='#24b47e';
+  }catch{
+    btn.disabled=false;btn.textContent='응답 데이터 제출';
+    status.textContent='전송 실패 — 아래 CSV 저장 후 실험자에게 전달해주세요.';
+    status.style.color='#f04438';
+  }
+}
+
+function downloadCSV(){
+  const reason=(document.getElementById('reason-txt')?.value||'').trim();
+  let csv='participant_id,trial_order,condition_id,condition_desc,perceived_duration,time_estimate,speed_perception,speed_pattern,progress_predictability,progress_clarity,frustration,attention,satisfaction,exit_intent\n';
+  responses.forEach(r=>{
+    csv+=`${PID},${r.trialOrder},${r.conditionId},"${r.conditionDesc}",${r.perceivedDuration},${r.timeEstimate},${r.speedPerception},${r.speedPattern},${r.progressPredictability},${r.progressClarity},${r.frustration},${r.attention},${r.satisfaction},${r.exitIntent}\n`;
+  });
+  csv+=`\npractice_q1,practice_q2,practice_q3,practice_q4,practice_q5,practice_q6,practice_q7,practice_q8,practice_q9,practice_time\n`;
+  csv+=`${practiceAns.q1},${practiceAns.q2},${practiceAns.q3},${practiceAns.q4},${practiceAns.q5},${practiceAns.q6},${practiceAns.q7},${practiceAns.q8},${practiceAns.q9},${practiceAns.time}\n`;
+  csv+=`\nfinal_shortest,final_preferred,reason\n${finalShortest},${finalPreferred},"${reason}"\n\norder_used\n${ORDER.map(i=>i+1).join(',')}\n`;
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`exp_p${PID}_${Date.now()}.csv`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+
+
+</script>
+</body>
+</html>
